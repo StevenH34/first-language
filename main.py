@@ -1,5 +1,6 @@
 from lexer import Lexer
 from parse import Parser
+from interpreter import Interpreter
 
 while True:
     text = input("Input: ")
@@ -9,5 +10,7 @@ while True:
     
     parser = Parser(tokens)
     tree = parser.parse()
-    print(tree)
+
+    interpreter = Interpreter(tree)
+    print(interpreter.interpret())
 
