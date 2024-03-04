@@ -1,7 +1,13 @@
 from lexer import Lexer
+from parse import Parser
 
 while True:
     text = input("Input: ")
+
     tokenizer = Lexer(text)
     tokens = tokenizer.tokenize()
-    print(tokens)
+    
+    parser = Parser(tokens)
+    tree = parser.parse()
+    print(tree)
+
