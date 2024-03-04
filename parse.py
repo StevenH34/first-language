@@ -10,6 +10,10 @@ class Parser:
     def factor(self): # Check if INT or FLT
         if self.token.type == "INT" or self.token.type == "FLT": 
             return self.token
+        elif self.token.value == "(":
+            self.move()
+            expression = self.expression()
+            return expression
     
     def term(self):
         leftNode = self.factor()
