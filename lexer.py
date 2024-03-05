@@ -3,12 +3,14 @@
 Take care of ints, floats, & ignore spaces
 Need to add vars, if statements, while loops
 """
-import tokens as token
+from tokens import Operation, Integer, Float, Declaration, Variable
 
 class Lexer:
     digits = "0123456789"
-    operations = "+-/*()"
+    letters = "abcdefghijklmnopqrstuvwxyz"
+    operations = "+-/*()="
     stopwords = [" "]
+    declarations = ["make"]
 
     def __init__(self, text) -> None:
         self.text = text
@@ -22,11 +24,18 @@ class Lexer:
             if self.char in Lexer.digits:
                 self.token = self.extractNumber()
             elif self.char in Lexer.operations:
-                self.token = token.Operation(self.char)
+                self.token = Operation(self.char)
                 self.move()
             elif self.char in Lexer.stopwords:
                 self.move()
                 continue
+            elif self.char in Lexer.letters:
+                word = self.extractWord()
+                if word in Lexer.declarations:
+                    self.token = Declaration(word)
+                else:
+                    self.token = Variable(word)
+
             self.tokens.append(self.token)
         return self.tokens
 
@@ -38,7 +47,14 @@ class Lexer:
                 isFloat = True
             number += self.char
             self.move()
-        return token.Integer(number) if not isFloat else token.Float(number)
+        return Integer(number) if not isFloat else Float(number)
+    
+    def extractWord(self):
+        word = ""
+        while self.char in Lexer.letters and self.index < len(self.text):
+            word += self.char
+            self.move()
+        return word
     
     def move(self):
         self.index += 1
