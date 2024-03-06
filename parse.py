@@ -6,6 +6,15 @@ class Parser:
 
     def parse(self):
         return self.statement()
+    
+    def variable(self):
+        if self.token.type.startswith("VAR"):
+            return self.token
+        
+    def move(self):
+        self.index += 1
+        if self.index < len(self.tokens):
+            self.token = self.tokens[self.index]
 
     def factor(self): # Check if INT or FLT
         if self.token.type == "INT" or self.token.type == "FLT": 
@@ -16,6 +25,11 @@ class Parser:
             return expression
         elif self.token.type.startswith("VAR"):
             return self.token
+        elif self.token.value == "+" or self.token.value == "-":
+            operator = self.token
+            self.move()
+            operand = self.factor() #self.expression()
+            return [operator, operand]
 
     def term(self):
         leftNode = self.factor()
@@ -36,11 +50,6 @@ class Parser:
             rightNode = self.term()
             leftNode = [leftNode, operation, rightNode]
         return leftNode
-
-    def move(self):
-        self.index += 1
-        if self.index < len(self.tokens):
-            self.token = self.tokens[self.index]
     
     def statement(self):
         if self.token.type == "DEC":
@@ -52,9 +61,6 @@ class Parser:
                 self.move()
                 rightNode = self.expression()
                 return [leftNode, operation, rightNode]
-        elif self.token.type == "INT" or self.token.type == "FLT" or self.token.type == "OP":
+        elif self.token.type == "INT" or self.token.type == "FLT" or self.token.type == "OPR":
             return self.expression()
     
-    def variable(self):
-        if self.token.type.startswith("VAR"):
-            return self.token
