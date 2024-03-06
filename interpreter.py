@@ -22,8 +22,6 @@ class Interpreter:
     def computeBinary(self, leftNode, operator, rightNode):
         leftType = "VAR" if str(leftNode.type).startswith("VAR") else str(leftNode.type)
         rightType = "VAR" if str(rightNode.type).startswith("VAR") else str(rightNode.type)
-        # leftType = str(leftNode.type)
-        # rightType = str(rightNode.type)
 
         if operator.value == "=":
             leftNode.type = f"VAR({rightType})"
@@ -43,20 +41,32 @@ class Interpreter:
             result = leftValue / rightValue
         
         return Integer(result) if (leftType == "INT" and rightType == "INT") else Float(result)
+    
+    def computeUnary(self, operator, operand):
+        operandType = "VAR" if str(operand.type).startswith("VAR") else str(operand.type)
+        operand = getattr(self, f"read_{operandType}")(operand.value)
+        
+        if operator.value == "+": 
+            return +operand
+        elif operator.value == "-":
+            return -operand
 
     def interpret(self, tree=None):
         if tree is None: tree = self.tree
-
-        leftNode = tree[0]     # Left subtree
-        if isinstance(leftNode, list):
-            leftNode = self.interpret(leftNode)
-
-        rightNode = tree[2]    # Right subtree
-        if isinstance(rightNode, list):
-            rightNode = self.interpret(rightNode)
         
-        operator = tree[1]     # Root node
-        
-        return self.computeBinary(leftNode, operator, rightNode)
-    
-    
+        # Unary operation
+        if isinstance(tree, list) and len(tree) == 2:
+            return self.computeUnary(tree[0], tree[1])
+        elif not isinstance(tree, list):
+            return tree
+        else:
+            leftNode = tree[0]     # Left subtree
+            if isinstance(leftNode, list):
+                leftNode = self.interpret(leftNode)
+
+            rightNode = tree[2]    # Right subtree
+            if isinstance(rightNode, list):
+                rightNode = self.interpret(rightNode)
+            
+            operator = tree[1]     # Root node            
+            return self.computeBinary(leftNode, operator, rightNode)

@@ -12,7 +12,7 @@ class Lexer:
     stopwords = [" "]
     declarations = ["make"]
 
-    def __init__(self, text) -> None:
+    def __init__(self, text):
         self.text = text
         self.index = 0
         self.tokens = []
