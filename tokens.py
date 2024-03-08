@@ -34,3 +34,7 @@ class Boolean(Token):
 class Comparison(Token):
     def __init__(self, value) -> None:
         super().__init__("COM", value)
+
+class Reserved(Token):
+    def __init__(self, value) -> None:
+        super().__init__("RES", value)
