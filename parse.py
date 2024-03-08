@@ -87,6 +87,8 @@ class Parser:
             return self.booleanExpression()
         elif self.token.value == "if":
             return [self.token, self.ifStatements()]
+        elif self.token.value == "while":
+            return [self.token, self.whileStatements()]
         
     def ifStatement(self):
         self.move()
@@ -119,3 +121,15 @@ class Parser:
             return [conditions, actions, elseAction]
 
         return [conditions, actions]
+    
+    def whileStatements(self):
+        self.move()
+        condition = self.booleanExpression()
+
+        if self.token.value == "do":
+            self.move()
+            action = self.statement()
+            return [condition, action]
+        elif self.tokens[self.index-1].value == "do":
+            action = self.statement()
+            return [condition, action]

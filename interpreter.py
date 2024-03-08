@@ -84,7 +84,13 @@ class Interpreter:
                         return self.interpret(tree[1][2])
                     else:
                         return
-
+                elif tree[0].value == "while":
+                    condition = self.interpret(tree[1][0])
+                    while condition.value == 1:
+                        print(self.interpret(tree[1][1]))
+                        condition = self.interpret(tree[1][0])
+                    return
+        
         # Unary operation
         if isinstance(tree, list) and len(tree) == 2:
             expression = tree[1]
