@@ -31,15 +31,30 @@ class Interpreter:
         leftValue = getattr(self, f"read_{leftType}")(leftNode.value)
         rightValue = getattr(self, f"read_{rightType}")(rightNode.value)
         
-        if operator.value == "+":
-            result = leftValue + rightValue
-        elif operator.value == "-":
-            result = leftValue - rightValue
-        elif operator.value == "*":
-            result = leftValue * rightValue
-        elif operator.value == "/":
-            result = leftValue / rightValue
-        
+        match operator.value:
+            case "+":
+                result = leftValue + rightValue
+            case "-":
+                result = leftValue - rightValue
+            case "*":
+                result = leftValue * rightValue
+            case "/":
+                result = leftValue / rightValue
+            case ">":
+                result = 1 if leftValue > rightValue else 0
+            case ">=":
+                result = 1 if leftValue >= rightValue else 0
+            case "<":
+                result = 1 if leftValue < rightValue else 0
+            case "<=":
+                result = 1 if leftValue <= rightValue else 0
+            case "==":
+                result = 1 if leftValue == rightValue else 0
+            case "and":
+                result = 1 if leftValue and rightValue else 0
+            case "or":
+                result = 1 if leftValue or rightValue else 0
+
         return Integer(result) if (leftType == "INT" and rightType == "INT") else Float(result)
     
     def computeUnary(self, operator, operand):
@@ -50,13 +65,18 @@ class Interpreter:
             return +operand
         elif operator.value == "-":
             return -operand
+        elif operator.value == "not":
+            return 1 if not operand else 0
 
     def interpret(self, tree=None):
         if tree is None: tree = self.tree
         
         # Unary operation
         if isinstance(tree, list) and len(tree) == 2:
-            return self.computeUnary(tree[0], tree[1])
+            expression = tree[1]
+            if isinstance(expression, list):
+                expression = self.interpret(expression)
+            return self.computeUnary(tree[0], expression)
         elif not isinstance(tree, list):
             return tree
         else:

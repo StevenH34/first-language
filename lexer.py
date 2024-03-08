@@ -3,7 +3,7 @@
 Take care of ints, floats, & ignore spaces
 Need to add vars, if statements, while loops
 """
-from tokens import Operation, Integer, Float, Declaration, Variable
+from tokens import Operation, Integer, Float, Declaration, Variable, Boolean, Comparison
 
 class Lexer:
     digits = "0123456789"
@@ -11,6 +11,9 @@ class Lexer:
     operations = "+-/*()="
     stopwords = [" "]
     declarations = ["make"]
+    boolean = ["and", "or", "not"]
+    comparison = ["<", "<=", ">", ">=", "=="]
+    specialCharacters = "<>="
 
     def __init__(self, text):
         self.text = text
@@ -24,8 +27,12 @@ class Lexer:
             if self.char in Lexer.digits:
                 self.token = self.extractNumber()
             elif self.char in Lexer.operations:
-                self.token = Operation(self.char)
-                self.move()
+                nextChar = self.text[self.index+1]
+                if nextChar != "=":
+                    self.token = Operation(self.char)
+                    self.move()
+                else:
+                    self.detectSpecialCharacters()
             elif self.char in Lexer.stopwords:
                 self.move()
                 continue
@@ -33,11 +40,22 @@ class Lexer:
                 word = self.extractWord()
                 if word in Lexer.declarations:
                     self.token = Declaration(word)
+                elif word in Lexer.boolean:
+                    self.token = Boolean(word)
                 else:
                     self.token = Variable(word)
+            elif self.char in Lexer.specialCharacters:
+                self.detectSpecialCharacters()
 
             self.tokens.append(self.token)
         return self.tokens
+
+    def detectSpecialCharacters(self):
+        comparisonOperator = ""
+        while self.char in Lexer.specialCharacters and self.index < len(self.text):
+            comparisonOperator += self.char
+            self.move()
+        self.token = Comparison(comparisonOperator)
 
     def extractNumber(self):
         number = ""

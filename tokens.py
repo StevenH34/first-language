@@ -26,3 +26,11 @@ class Declaration(Token):
 class Variable(Token):
     def __init__(self, value) -> None:
         super().__init__("VAR(?)", value)
+
+class Boolean(Token):
+    def __init__(self, value) -> None:
+        super().__init__("BOO", value)
+
+class Comparison(Token):
+    def __init__(self, value) -> None:
+        super().__init__("COM", value)
