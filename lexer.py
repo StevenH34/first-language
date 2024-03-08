@@ -3,7 +3,7 @@
 Take care of ints, floats, & ignore spaces
 Need to add vars, if statements, while loops
 """
-from tokens import Operation, Integer, Float, Declaration, Variable, Boolean, Comparison
+from tokens import Operation, Integer, Float, Declaration, Variable, Boolean, Comparison, Reserved
 
 class Lexer:
     digits = "0123456789"
@@ -14,6 +14,7 @@ class Lexer:
     boolean = ["and", "or", "not"]
     comparison = ["<", "<=", ">", ">=", "=="]
     specialCharacters = "<>="
+    reserved = ["if", "elif", "else", "do"]
 
     def __init__(self, text):
         self.text = text
@@ -42,6 +43,8 @@ class Lexer:
                     self.token = Declaration(word)
                 elif word in Lexer.boolean:
                     self.token = Boolean(word)
+                elif word in Lexer.reserved:
+                    self.token = Reserved(word)
                 else:
                     self.token = Variable(word)
             elif self.char in Lexer.specialCharacters:

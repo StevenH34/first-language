@@ -25,7 +25,7 @@ class Parser:
             return expression
         elif self.token.value == "not":
             operator = self.token
-            self.move()
+            self.move() 
             return [operator, self.booleanExpression()]
         elif self.token.type.startswith("VAR"):
             return self.token
@@ -85,4 +85,37 @@ class Parser:
                 return [leftNode, operation, rightNode]
         elif self.token.type == "INT" or self.token.type == "FLT" or self.token.type == "OPR" or self.token.value == "not":
             return self.booleanExpression()
+        elif self.token.value == "if":
+            return [self.token, self.ifStatements()]
+        
+    def ifStatement(self):
+        self.move()
+        condition = self.booleanExpression()
+
+        if self.token.value == "do":
+            self.move()
+            action = self.statement()
+            return condition, action
+        elif self.tokens[self.index-1].value == "do":
+            action = self.statement()
+            return condition, action
     
+    def ifStatements(self):
+        conditions, actions = [], []
+        ifStatement = self.ifStatement()
+        
+        conditions.append(ifStatement[0])
+        actions.append(ifStatement[1])
+
+        while self.token.value == "elif":
+            ifStatement = self.ifStatement()
+            conditions.append(ifStatement[0])
+            actions.append(ifStatement[1])
+        
+        if self.token.value == "else":
+            self.move()
+            self.move()
+            elseAction = self.statement()
+            return [conditions, actions, elseAction]
+
+        return [conditions, actions]

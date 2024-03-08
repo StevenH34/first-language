@@ -1,7 +1,7 @@
 """
 Post-order traversal: Left subtree -> Right subtree -> Root Node
 """
-from tokens import Integer, Float
+from tokens import Integer, Float, Reserved
 
 class Interpreter:
     def __init__(self, tree, base):
@@ -62,15 +62,29 @@ class Interpreter:
         operand = getattr(self, f"read_{operandType}")(operand.value)
         
         if operator.value == "+": 
-            return +operand
+            output = +operand
         elif operator.value == "-":
-            return -operand
+            output = -operand
         elif operator.value == "not":
-            return 1 if not operand else 0
+            output = 1 if not operand else 0
+        
+        return Integer(output) if (operandType == "INT") else Float(output)
 
     def interpret(self, tree=None):
         if tree is None: tree = self.tree
         
+        if isinstance(tree, list):
+            if isinstance(tree[0], Reserved):
+                if tree[0].value == "if":
+                    for index, condition in enumerate(tree[1][0]):
+                        evaluation = self.interpret(condition)
+                        if evaluation.value == 1:
+                            return self.interpret(tree[1][1][index])
+                    if len(tree[1]) == 3:
+                        return self.interpret(tree[1][2])
+                    else:
+                        return
+
         # Unary operation
         if isinstance(tree, list) and len(tree) == 2:
             expression = tree[1]
